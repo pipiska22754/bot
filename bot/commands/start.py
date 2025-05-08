@@ -1,13 +1,13 @@
 from telethon import events
-from bot.config import logger
+from config import ADMINS
 
 async def start_handler(event):
-    try:
-        await event.reply(
-            "🤖 Бот работает!\n"
-            "Доступные команды:\n"
-            "/stats - Статистика\n"
-            "/logs - Логи (админы)"
-        )
-    except Exception as e:
-        logger.error(f"Start error: {e}")
+    if str(event.sender_id) not in ADMINS:
+        return
+    
+    await event.reply(
+        "🤖 **Бот управления рассылкой**\n\n"
+        "Доступные команды:\n"
+        "/add_chat [id] - Добавить чат\n"
+        "/stats - Статистика"
+    )
