@@ -1,19 +1,19 @@
-name: Telegram Mailing
+name: Mailing
 
 on:
   workflow_dispatch:
     inputs:
       message:
-        description: 'Текст рассылки'
+        description: 'Текст сообщения'
         required: true
 
 jobs:
-  mailing:
+  send:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
@@ -21,13 +21,13 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
         
-      - name: Setup environment
+      - name: Setup config
         run: |
           echo "API_ID=${{ secrets.API_ID }}" > .env
           echo "API_HASH=${{ secrets.API_HASH }}" >> .env
           echo "PHONE=${{ secrets.PHONE }}" >> .env
-          echo "${{ secrets.GROUPS }}" > groups.txt
           echo "${{ secrets.ADMINS }}" > admins.txt
+          echo "${{ secrets.GROUPS }}" > groups.txt
           
       - name: Run mailing
-        run: python -m bot.sender_client "${{ inputs.message }}"
+        run: python -c "from bot.sender_client import send_mailing; import asyncio; asyncio.run(send_mailing('${{ inputs.message }}'))"
